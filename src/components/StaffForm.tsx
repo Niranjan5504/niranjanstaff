@@ -31,28 +31,23 @@ export function StaffForm({ staff, onSubmit, onClose }: StaffFormProps) {
     }
   );
   const [uploading, setUploading] = React.useState(false);
+  const [newPhoto, setNewPhoto] = React.useState<string | null>(null);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
-  const handleImageUpload = async (file: File) => {
-    try {
-      setUploading(true);
-      const options = {
-        maxSizeMB: 1,
-        maxWidthOrHeight: 800,
-        useWebWorker: true
+  
+  const handleImageUpload = (file: File) => {
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const imageDataUrl = reader.result as string; // Get the uploaded image data
+        setNewPhoto(imageDataUrl); // Update the newPhoto state
+        setFormData({ ...formData, imageUrl: imageDataUrl ?? undefined }); // Update formData with the new image
+        console.log("Image uploaded successfully:", imageDataUrl);
       };
-      const compressedFile = await imageCompression(file, options);
-      const storageRef = ref(storage, `staff-photos/${Date.now()}-${file.name}`);
-      const snapshot = await uploadBytes(storageRef, compressedFile);
-      const downloadURL = await getDownloadURL(snapshot.ref);
-      setFormData({ ...formData, imageUrl: downloadURL });
-    } catch (error) {
-      console.error('Error uploading image:', error);
-    } finally {
-      setUploading(false);
+      reader.readAsDataURL(file);
     }
   };
-
+  
   const handleAddEducation = () => {
     setFormData({
       ...formData,
@@ -113,14 +108,8 @@ export function StaffForm({ staff, onSubmit, onClose }: StaffFormProps) {
           {staff ? 'Edit Staff Member' : 'Add New Staff Member'}
         </h2>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6 max-h-[500px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100">
           {/* Profile Image */}
-          <br /><br />
-          <br /><br />
-          <br /><br />
-          <br /><br />
-          <br /><br />
-          <br /><br />
           <div className="flex justify-center">
             <div className="relative w-32 h-32">
               <img
