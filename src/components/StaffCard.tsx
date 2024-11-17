@@ -176,20 +176,55 @@ export function StaffCard({ staff, onEdit, onDelete }: StaffCardProps) {
 
     // Research
     if (staff.research?.length) {
-        doc.setFontSize(14);
-        doc.setFont('helvetica', 'bold');
-        doc.text("Research", leftMargin, currentY);
-        doc.setFontSize(12);
-        doc.setFont('helvetica', 'normal');
-        currentY += 10;
+      doc.setFontSize(14);
+      doc.setFont('helvetica', 'bold');
+      doc.text("Research", leftMargin, currentY);
+      currentY += 10; // Add some spacing
+      checkPageOverflow();
+    
+      staff.research.forEach((research, index) => {
+        // // Section Title
+        // doc.setFontSize(12);
+        // doc.setFont('helvetica', 'bold');
+        // doc.text(`${index + 1}. ${research.title}`, leftMargin, currentY);
+        // currentY += 7;
+        // checkPageOverflow();
+    
+        // // Area of Research
+        // doc.setFontSize(11);
+        // doc.setFont('helvetica', 'normal');
+        // doc.text(`Area: ${research.area}`, leftMargin, currentY);
+        // currentY += 6;
+        // checkPageOverflow();
+    
+        // Description
+        const splitDescription = doc.splitTextToSize(research.description, 180); // Wrap text to fit PDF width
+        doc.text(splitDescription, leftMargin, currentY);
+        currentY += splitDescription.length * 6; // Adjust spacing dynamically
         checkPageOverflow();
-
-        staff.research.forEach((res, index) => {
-            doc.text(`${index + 1}. ${res}`, leftMargin, currentY);
-            currentY += 10;
-            checkPageOverflow();
-        });
+    
+        // // Publications
+        // if (research.publications?.length > 0) {
+        //   doc.setFontSize(11);
+        //   doc.setFont('helvetica', 'bold');
+        //   doc.text("Publications:", leftMargin, currentY);
+        //   currentY += 6;
+        //   checkPageOverflow();
+    
+        //   doc.setFont('helvetica', 'normal');
+        //   research.publications.forEach((pub, pubIndex) => {
+        //     const pubText = `${pubIndex + 1}. ${pub}`;
+        //     const splitPubText = doc.splitTextToSize(pubText, 170);
+        //     doc.text(splitPubText, leftMargin + 10, currentY); // Indent for list items
+        //     currentY += splitPubText.length * 6;
+        //     checkPageOverflow();
+        //   });
+        // }
+    
+        currentY += 10; // Add spacing before next research entry
+      });
     }
+    
 
     // Save PDF
     doc.save(`${staff.firstName}_${staff.lastName}_Profile.pdf`);
